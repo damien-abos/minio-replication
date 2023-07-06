@@ -15,6 +15,9 @@
 		"ghcr.io/devcontainers/features/docker-in-docker": {
 			"version": "latest",
 			"moby": true
+		},
+		"ghcr.io/devcontainers/features/python": {
+			"version": "latest"
 		}
 	},
 

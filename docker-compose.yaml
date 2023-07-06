@@ -23,7 +23,7 @@ services:
       - MINIO_SCHEME=http
       - MINIO_BROWSER_REDIRECT_URL=http://localhost:8001
     volumes:
-      - 'replica_data:/data'
+      - 'minio-replica_data:/data'
   minio-0:
     image: bitnami/minio:2023.6.23
     environment:
@@ -97,7 +97,7 @@ volumes:
   minio-3_data-1:
   minio-3_data-2:
   minio-3_data-3:
-  replica_data:
+  minio-replica_data:
   haproxy:
 
 configs:
