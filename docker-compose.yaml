@@ -1,0 +1,106 @@
+services:
+ 
+  haproxy:
+    image: haproxy:lts
+    configs:
+      - source: haproxy_config
+        target: /usr/local/etc/haproxy/haproxy.cfg
+    ports:
+      - '8080:8080'
+      - '8000:8000'
+      - '8001:8001'
+      - '9000:9000'
+      - '9001:9001'
+    volumes:
+      - 'haproxy:/var/run/haproxy:rw'
+
+  replica:
+    image: bitnami/minio:2023.6.23
+    environment:
+      - MINIO_ROOT_USER=minio-root-user
+      - MINIO_ROOT_PASSWORD=minio-root-password
+      - MINIO_SKIP_CLIENT=yes
+      - MINIO_SCHEME=http
+      - MINIO_BROWSER_REDIRECT_URL=http://localhost:8001
+    volumes:
+      - 'replica_data:/data'
+  minio-0:
+    image: bitnami/minio:2023.6.23
+    environment:
+      - MINIO_ROOT_USER=minio-root-user
+      - MINIO_ROOT_PASSWORD=minio-root-password
+      - MINIO_DISTRIBUTED_MODE_ENABLED=yes
+      - MINIO_DISTRIBUTED_NODES=minio-{0...3}/data/part{0...3}
+      - MINIO_SKIP_CLIENT=yes
+      - MINIO_SCHEME=http
+    volumes:
+      - 'minio-0_data-0:/data/part0:rw'
+      - 'minio-0_data-1:/data/part1:rw'
+      - 'minio-0_data-2:/data/part2:rw'
+      - 'minio-0_data-3:/data/part3:rw'
+  minio-1:
+    image: bitnami/minio:2023.6.23
+    environment:
+      - MINIO_ROOT_USER=minio-root-user
+      - MINIO_ROOT_PASSWORD=minio-root-password
+      - MINIO_DISTRIBUTED_MODE_ENABLED=yes
+      - MINIO_DISTRIBUTED_NODES=minio-{0...3}/data/part{0...3}
+      - MINIO_SKIP_CLIENT=yes
+      - MINIO_SCHEME=http
+    volumes:
+      - 'minio-1_data-0:/data/part0:rw'
+      - 'minio-1_data-1:/data/part1:rw'
+      - 'minio-1_data-2:/data/part2:rw'
+      - 'minio-1_data-3:/data/part3:rw'
+  minio-2:
+    image: bitnami/minio:2023.6.23
+    environment:
+      - MINIO_ROOT_USER=minio-root-user
+      - MINIO_ROOT_PASSWORD=minio-root-password
+      - MINIO_DISTRIBUTED_MODE_ENABLED=yes
+      - MINIO_DISTRIBUTED_NODES=minio-{0...3}/data/part{0...3}
+      - MINIO_SKIP_CLIENT=yes
+      - MINIO_SCHEME=http
+    volumes:
+      - 'minio-2_data-0:/data/part0:rw'
+      - 'minio-2_data-1:/data/part1:rw'
+      - 'minio-2_data-2:/data/part2:rw'
+      - 'minio-2_data-3:/data/part3:rw'
+  minio-3:
+    image: bitnami/minio:2023.6.23
+    environment:
+      - MINIO_ROOT_USER=minio-root-user
+      - MINIO_ROOT_PASSWORD=minio-root-password
+      - MINIO_DISTRIBUTED_MODE_ENABLED=yes
+      - MINIO_DISTRIBUTED_NODES=minio-{0...3}/data/part{0...3}
+      - MINIO_SKIP_CLIENT=yes
+      - MINIO_SCHEME=http
+    volumes:
+      - 'minio-3_data-0:/data/part0:rw'
+      - 'minio-3_data-1:/data/part1:rw'
+      - 'minio-3_data-2:/data/part2:rw'
+      - 'minio-3_data-3:/data/part3:rw'
+volumes:
+  minio-0_data-0:
+  minio-0_data-1:
+  minio-0_data-2:
+  minio-0_data-3:
+  minio-1_data-0:
+  minio-1_data-1:
+  minio-1_data-2:
+  minio-1_data-3:
+  minio-2_data-0:
+  minio-2_data-1:
+  minio-2_data-2:
+  minio-2_data-3:
+  minio-3_data-0:
+  minio-3_data-1:
+  minio-3_data-2:
+  minio-3_data-3:
+  replica_data:
+  haproxy:
+
+configs:
+  haproxy_config:
+    file: haproxy.cfg
+    
