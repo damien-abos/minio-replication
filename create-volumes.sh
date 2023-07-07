@@ -19,3 +19,4 @@ docker volume create minio-replication_minio-3_data-2
 docker volume create minio-replication_minio-3_data-3
 docker volume create minio-replication_minio-replica_data
 docker volume create minio-replication_haproxy
+docker volume create minio-replication_prometheus

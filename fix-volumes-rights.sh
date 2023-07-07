@@ -19,5 +19,6 @@ chown -R 1001:1001 /var/lib/docker/volumes/minio-replication_minio-3_data-2
 chown -R 1001:1001 /var/lib/docker/volumes/minio-replication_minio-3_data-3
 chown -R 1001:1001 /var/lib/docker/volumes/minio-replication_minio-replica_data
 chown -R 99:99 /var/lib/docker/volumes/minio-replication_haproxy
+chown -R 1001:1001 /var/lib/docker/volumes/minio-replication_prometheus
 
 chmod -R 775 /var/lib/docker/volumes

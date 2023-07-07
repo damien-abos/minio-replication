@@ -11,8 +11,9 @@ services:
       - '8001:8001'
       - '9000:9000'
       - '9001:9001'
+      - '9090:9090'
     volumes:
-      - 'haproxy:/var/run/haproxy:rw'
+      - 'minio-replication_haproxy:/var/run/haproxy:rw'
 
   replica:
     image: bitnami/minio:2023.6.23
@@ -22,8 +23,11 @@ services:
       - MINIO_SKIP_CLIENT=yes
       - MINIO_SCHEME=http
       - MINIO_BROWSER_REDIRECT_URL=http://localhost:8001
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+      - MINIO_PROMETHEUS_URL=http://prometheus:9090
+      - MINIO_PROMETHEUS_JOB_ID=replica
     volumes:
-      - 'minio-replica_data:/data'
+      - 'minio-replication_minio-replica_data:/data'
   minio-0:
     image: bitnami/minio:2023.6.23
     environment:
@@ -33,11 +37,14 @@ services:
       - MINIO_DISTRIBUTED_NODES=minio-{0...3}/data/part{0...3}
       - MINIO_SKIP_CLIENT=yes
       - MINIO_SCHEME=http
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+      - MINIO_PROMETHEUS_URL=http://prometheus:9090
+      - MINIO_PROMETHEUS_JOB_ID=minio-cluster
     volumes:
-      - 'minio-0_data-0:/data/part0:rw'
-      - 'minio-0_data-1:/data/part1:rw'
-      - 'minio-0_data-2:/data/part2:rw'
-      - 'minio-0_data-3:/data/part3:rw'
+      - 'minio-replication_minio-0_data-0:/data/part0:rw'
+      - 'minio-replication_minio-0_data-1:/data/part1:rw'
+      - 'minio-replication_minio-0_data-2:/data/part2:rw'
+      - 'minio-replication_minio-0_data-3:/data/part3:rw'
   minio-1:
     image: bitnami/minio:2023.6.23
     environment:
@@ -47,11 +54,14 @@ services:
       - MINIO_DISTRIBUTED_NODES=minio-{0...3}/data/part{0...3}
       - MINIO_SKIP_CLIENT=yes
       - MINIO_SCHEME=http
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+      - MINIO_PROMETHEUS_URL=http://prometheus:9090
+      - MINIO_PROMETHEUS_JOB_ID=minio-cluster
     volumes:
-      - 'minio-1_data-0:/data/part0:rw'
-      - 'minio-1_data-1:/data/part1:rw'
-      - 'minio-1_data-2:/data/part2:rw'
-      - 'minio-1_data-3:/data/part3:rw'
+      - 'minio-replication_minio-1_data-0:/data/part0:rw'
+      - 'minio-replication_minio-1_data-1:/data/part1:rw'
+      - 'minio-replication_minio-1_data-2:/data/part2:rw'
+      - 'minio-replication_minio-1_data-3:/data/part3:rw'
   minio-2:
     image: bitnami/minio:2023.6.23
     environment:
@@ -61,11 +71,14 @@ services:
       - MINIO_DISTRIBUTED_NODES=minio-{0...3}/data/part{0...3}
       - MINIO_SKIP_CLIENT=yes
       - MINIO_SCHEME=http
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+      - MINIO_PROMETHEUS_URL=http://prometheus:9090
+      - MINIO_PROMETHEUS_JOB_ID=minio-cluster
     volumes:
-      - 'minio-2_data-0:/data/part0:rw'
-      - 'minio-2_data-1:/data/part1:rw'
-      - 'minio-2_data-2:/data/part2:rw'
-      - 'minio-2_data-3:/data/part3:rw'
+      - 'minio-replication_minio-2_data-0:/data/part0:rw'
+      - 'minio-replication_minio-2_data-1:/data/part1:rw'
+      - 'minio-replication_minio-2_data-2:/data/part2:rw'
+      - 'minio-replication_minio-2_data-3:/data/part3:rw'
   minio-3:
     image: bitnami/minio:2023.6.23
     environment:
@@ -75,32 +88,64 @@ services:
       - MINIO_DISTRIBUTED_NODES=minio-{0...3}/data/part{0...3}
       - MINIO_SKIP_CLIENT=yes
       - MINIO_SCHEME=http
+      - MINIO_PROMETHEUS_AUTH_TYPE=public
+      - MINIO_PROMETHEUS_URL=http://prometheus:9090
+      - MINIO_PROMETHEUS_JOB_ID=minio-cluster
     volumes:
-      - 'minio-3_data-0:/data/part0:rw'
-      - 'minio-3_data-1:/data/part1:rw'
-      - 'minio-3_data-2:/data/part2:rw'
-      - 'minio-3_data-3:/data/part3:rw'
+      - 'minio-replication_minio-3_data-0:/data/part0:rw'
+      - 'minio-replication_minio-3_data-1:/data/part1:rw'
+      - 'minio-replication_minio-3_data-2:/data/part2:rw'
+      - 'minio-replication_minio-3_data-3:/data/part3:rw'
+  prometheus:
+    image: bitnami/prometheus:2.45.0
+    configs:
+      - source: prometheus_config
+        target: /opt/bitnami/prometheus/conf/prometheus.yml
+    volumes:
+      - 'minio-replication_prometheus:/opt/bitnami/prometheus/data'
+
 volumes:
-  minio-0_data-0:
-  minio-0_data-1:
-  minio-0_data-2:
-  minio-0_data-3:
-  minio-1_data-0:
-  minio-1_data-1:
-  minio-1_data-2:
-  minio-1_data-3:
-  minio-2_data-0:
-  minio-2_data-1:
-  minio-2_data-2:
-  minio-2_data-3:
-  minio-3_data-0:
-  minio-3_data-1:
-  minio-3_data-2:
-  minio-3_data-3:
-  minio-replica_data:
-  haproxy:
+  minio-replication_minio-0_data-0:
+    external: true
+  minio-replication_minio-0_data-1:
+    external: true
+  minio-replication_minio-0_data-2:
+    external: true
+  minio-replication_minio-0_data-3:
+    external: true
+  minio-replication_minio-1_data-0:
+    external: true
+  minio-replication_minio-1_data-1:
+    external: true
+  minio-replication_minio-1_data-2:
+    external: true
+  minio-replication_minio-1_data-3:
+    external: true
+  minio-replication_minio-2_data-0:
+    external: true
+  minio-replication_minio-2_data-1:
+    external: true
+  minio-replication_minio-2_data-2:
+    external: true
+  minio-replication_minio-2_data-3:
+    external: true
+  minio-replication_minio-3_data-0:
+    external: true
+  minio-replication_minio-3_data-1:
+    external: true
+  minio-replication_minio-3_data-2:
+    external: true
+  minio-replication_minio-3_data-3:
+    external: true
+  minio-replication_minio-replica_data:
+    external: true
+  minio-replication_haproxy:
+    external: true
+  minio-replication_prometheus:
+    external: true
 
 configs:
   haproxy_config:
     file: haproxy.cfg
-    
+  prometheus_config:
+    file: prometheus.yml
