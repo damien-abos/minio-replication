@@ -12,6 +12,7 @@ services:
       - '9000:9000'
       - '9001:9001'
       - '9090:9090'
+      - '3000:3000'
     volumes:
       - 'minio-replication_haproxy:/var/run/haproxy:rw'
 
@@ -103,6 +104,30 @@ services:
         target: /opt/bitnami/prometheus/conf/prometheus.yml
     volumes:
       - 'minio-replication_prometheus:/opt/bitnami/prometheus/data'
+  grafana:
+    image: bitnami/grafana:10.0.1
+    configs:
+      - source: grafana_config
+        target: /opt/bitnami/grafana/conf/grafana.ini
+    environment:
+      - GF_RENDERING_SERVER_URL=http://grafana-image-renderer:8080/render
+      - GF_RENDERING_CALLBACK_URL=http://grafana:3000/
+  grafana-image-renderer:
+    image: bitnami/grafana-image-renderer:3.7.1
+    environment:
+      - ENABLE_METRICS=true
+  influxdb:
+    image: bitnami/influxdb:2.7.1
+    environment:
+      - INFLUXDB_ADMIN_USER=influxdb-root-user
+      - INFLUXDB_ADMIN_USER_PASSWORD=influxdb-root-password
+      - INFLUXDB_ADMIN_USER_TOKEN=influxdb-root-token
+      - INFLUXDB_HTTP_AUTH_ENABLED=false
+    ports:
+      - '8086:8086'
+      - '8088:8088'
+    #volumes:
+    #  - 'minio-replication_influxdb:/'
 
 volumes:
   minio-replication_minio-0_data-0:
@@ -149,3 +174,7 @@ configs:
     file: haproxy.cfg
   prometheus_config:
     file: prometheus.yml
+  grafana_config:
+    file: grafana.ini
+  influxdb_config:
+    file: influxdb.conf
